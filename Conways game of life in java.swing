@@ -1,0 +1,346 @@
+//this a main class
+package cgol;
+
+public class Main {
+   static int width;
+   static int height;
+	public static void main(String[] args) {
+		Frame f  = new Frame();
+        f.setDefaultCloseOperation(3);
+		
+		f.setVisible(true);
+		f.setResizable(false);
+		
+	   width = f.getWidth();
+		 height = f.getHeight();
+		
+		f.createScreen();
+		
+		long lastFrame = System.currentTimeMillis();
+		while(true) {
+			
+			long thisFrame = System.currentTimeMillis();
+			float tslf = (float) ((thisFrame - lastFrame) /1000.);
+			lastFrame = thisFrame;
+			f.update(tslf);
+			f.repaint();
+			
+			
+			try 
+			{
+				Thread.sleep(10);
+			}catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		}
+	}
+  
+
+//this is a class that creates window with a game
+package cgol;
+
+import java.awt.Color;
+import java.awt.Graphics;
+
+public class Cell {
+	private int x;
+	private int y;
+	private boolean alive;
+	private boolean nextround;
+	static boolean grid = true;
+	static int size = 10;
+	public Cell(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+	public boolean isAlive () {
+		
+		return alive;
+	}
+	
+
+	
+	public void setAlive(boolean alive) {
+		this.alive = alive;
+	}
+	public void setNextRound(boolean nextround) {
+		this.nextround= nextround;
+		
+	}
+	public void nextRound() {
+		alive = nextround;
+		
+	}
+	public void draw(Graphics g) {
+		if(grid)
+		{
+		g.setColor(Color.BLACK);
+		g.drawRect(x * size, y * size, size, size);
+		if(alive) g.setColor(Color.BLACK);
+		else g.setColor(Color.WHITE);
+		g.fillRect(x * size +1, y * size +1, size - 1, size - 1);
+		}
+		else
+		{
+			if(alive) g.setColor(Color.BLACK);
+			else g.setColor(Color.WHITE);
+			g.fillRect(x * size , y * size , size , size );
+			
+		}
+		
+		
+		
+		
+	}
+
+}
+
+
+
+
+//this is a class that creates cells
+package cgol;
+
+import java.awt.Color;
+import java.awt.Graphics;
+
+public class Cell {
+	private int x;
+	private int y;
+	private boolean alive;
+	private boolean nextround;
+	static boolean grid = true;
+	static int size = 10;
+	public Cell(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+	public boolean isAlive () {
+		
+		return alive;
+	}
+	
+
+	
+	public void setAlive(boolean alive) {
+		this.alive = alive;
+	}
+	public void setNextRound(boolean nextround) {
+		this.nextround= nextround;
+		
+	}
+	public void nextRound() {
+		alive = nextround;
+		
+	}
+	public void draw(Graphics g) {
+		if(grid)
+		{
+		g.setColor(Color.BLACK);
+		g.drawRect(x * size, y * size, size, size);
+		if(alive) g.setColor(Color.BLACK);
+		else g.setColor(Color.WHITE);
+		g.fillRect(x * size +1, y * size +1, size - 1, size - 1);
+		}
+		else
+		{
+			if(alive) g.setColor(Color.BLACK);
+			else g.setColor(Color.WHITE);
+			g.fillRect(x * size , y * size , size , size );
+			
+		}
+		}
+}
+
+//this is class that simuates life process
+package cgol;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.util.Random;
+
+
+public class LifeSimulation implements KeyListener, MouseListener, MouseMotionListener {
+	
+	private Cell[] [] cells;
+	private Random random;
+	private final int width = Main.width/Cell.size;
+	private  final int height = Main.height/Cell.size;
+	private int generation;
+	private int button;
+	private boolean go;
+	public LifeSimulation() {
+		random  = new Random ();
+		cells = new Cell [width] [height];
+		for (int x = 0; x < width; x ++)
+		{
+			for (int y = 0; y < height; y ++)
+			{
+				cells [x] [y] = new Cell (x, y);
+				
+				
+				
+				
+			}
+			
+		}
+		
+		
+	}
+	public void update() {
+		if(go) {
+		generation ++;
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y ++) {
+			 int ix = x -1;
+				if(ix < 0) ix = width - 1;
+			 int iy = y - 1;
+				if (iy < 0) iy = height -1;
+				int jx = (x + 1) % width;
+				int jy= (y + 1)% height ;
+				
+				int aliveCounter = 0;
+				if (cells[ix] [iy].isAlive()) aliveCounter++;
+				if (cells[ix] [y].isAlive()) aliveCounter++;
+				if (cells[ix] [jy].isAlive()) aliveCounter++;
+				if (cells[x] [iy].isAlive()) aliveCounter++;
+				if (cells[x] [jy].isAlive()) aliveCounter++;
+				if (cells[jx] [iy].isAlive()) aliveCounter++;
+				if (cells[jx] [y].isAlive()) aliveCounter++;
+				if (cells[jx] [jy].isAlive()) aliveCounter++;
+				
+				if(aliveCounter < 2|| aliveCounter  >3) cells[x][y].setNextRound(false);
+				else if(aliveCounter == 3) cells[x][y].setNextRound(true);
+				
+			}
+		}
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y ++) {
+				cells[x][y].nextRound();
+				
+				
+			}
+		}
+		}
+			}
+	
+	public void draw(Graphics g) {
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y ++) {
+				cells [x] [y].draw(g);
+			}
+		}
+		g.setColor(Color.BLUE);
+		g.setFont(new Font("SanSerif", Font.BOLD, 25));
+		g.drawString("" + generation, 10, 10 + g.getFont().getSize());
+		
+	}
+	@Override
+	public void keyPressed(KeyEvent e) {
+		
+		
+	}
+	@Override
+	public void keyReleased(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_G) {
+			if(Cell.grid)Cell.grid = false;
+			else Cell.grid = true;
+			
+		}
+		if (e.getKeyCode() == KeyEvent.VK_Z) {
+			for (int x = 0; x < width; x ++)
+			{
+				for (int y = 0; y < height; y ++)
+				{
+					cells[x] [y].setAlive(random.nextBoolean());
+				}
+		}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			
+			if(go) go = false;
+			else go = true;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_R) {
+			for (int x = 0; x < width; x ++)
+			{
+				for (int y = 0; y < height; y ++)
+				{
+					cells[x] [y].setAlive(false);	
+				}
+			}
+		}
+	}
+	@Override
+	public void keyTyped(KeyEvent e) {
+		
+	}
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		if(!go)
+		{
+			int ix = e.getX()/Cell.size;
+			int iy = e.getY()/Cell.size;
+			
+			if(button == 1) cells [ix] [iy].setAlive(true);
+			else cells[ix] [iy].setAlive(false);
+		}
+		
+	}
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		if(!go)
+		{
+			
+			int ix = e.getX()/Cell.size;
+			int iy = e.getY()/Cell.size;
+			if (button == 1) cells[ix][iy].setAlive(true);
+			else if(button != -1) cells[ix][iy].setAlive(false);
+			
+			}
+		}
+		
+		
+	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		
+		
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		
+		
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
+		
+		
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+		button = e.getButton();
+		if(!go)
+		{
+			
+			int ix = e.getX()/Cell.size;
+			int iy = e.getY()/Cell.size;
+			if (button == 1) cells[ix][iy].setAlive(true);
+			else cells [ix][iy].setAlive(false);
+			
+			}
+		
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		button = -1;
+		
+	}
+}
